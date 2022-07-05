@@ -44,7 +44,7 @@
       "properties": {
         "vscodePipe.menus": {
           "type": "array",
-          "description": "This is test menus",
+          "description": "VSCode Command Menu",
           "default": [
             {
               "label": "UpperCase",
@@ -62,7 +62,7 @@
         },
         "vscodePipe.maxBuffer": {
           "type": "integer",
-          "description": "The maxBuffer of child_process",
+          "description": "The maxBuffer specifies the largest amount of data allowed on stdout or stderr.",
           "default": 1048576
         }
       }
