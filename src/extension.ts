@@ -1,26 +1,86 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { exec } from "child_process";
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+type Menu = {
+  label: string;
+  description: string;
+};
+
 export function activate(context: vscode.ExtensionContext) {
-	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vscode-pipe" is now active!');
+  const disposable = vscode.commands.registerCommand(
+    "vscodePipe.convert",
+    function () {
+      const editor = vscode.window.activeTextEditor;
+      if (editor) {
+        const document = editor.document;
+        const selection = editor.selection;
+        const text = document.getText(selection);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('vscode-pipe.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from vscode-pipe!');
-	});
+        const config = vscode.workspace.getConfiguration("vscodePipe");
+        const menus = config.get<Menu[]>("menus");
+        if (!menus) {
+          vscode.window.showWarningMessage("Menu is not defined.");
+          return;
+        }
+        console.log("menus=" + menus?.toString());
 
-	context.subscriptions.push(disposable);
+        const maxBuffer = config.get<number>("maxBuffer");
+        console.log("maxBuffer=" + maxBuffer);
+
+        let items: vscode.QuickPickItem[] = [];
+        for (let menu of menus) {
+          items.push({ label: menu.label, description: menu.description });
+        }
+
+        const execAsync = (command: string, input: string): Promise<string> => {
+          return new Promise((resolve, reject) => {
+            const process = exec(
+              command,
+              { maxBuffer: maxBuffer },
+              (error, stdout, stderr) => {
+                if (error) {
+                  reject(error);
+                } else {
+                  if (stderr) {
+                    vscode.window.showInformationMessage(stderr);
+                  }
+                  if (stdout) {
+                    resolve(stdout);
+                  }
+                }
+              }
+            );
+            process.stdin?.write(input);
+            process.stdin?.end();
+          });
+        };
+
+        vscode.window.showQuickPick(items).then((selectedMenu) => {
+          if (!selectedMenu) {
+            return;
+          }
+
+          (async function () {
+            const command = selectedMenu.description;
+            console.log("command=" + command);
+            if (!command) {
+              return;
+            }
+            const result = await execAsync(command, text)
+              .then((output) => {
+                editor.edit((editBuilder) => {
+                  editBuilder.replace(selection, output);
+                });
+              })
+              .catch((error) => {
+                vscode.window.showWarningMessage(error.message);
+              });
+            console.log(result);
+          })();
+        });
+      }
+    }
+  );
+
+  context.subscriptions.push(disposable);
 }
-
-// this method is called when your extension is deactivated
-export function deactivate() {}
