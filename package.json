@@ -47,8 +47,8 @@
           "description": "VSCode Command Menu",
           "default": [
             {
-              "label": "UpperCase",
-              "description": "python ~/dev/vscode/vscodepipe/test.py"
+              "label": "Upper Case",
+              "description": "tr '[:lower:]' '[:upper:]' "
             },
             {
               "label": "ls",
