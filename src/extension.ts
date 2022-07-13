@@ -6,79 +6,105 @@ type Menu = {
   description: string;
 };
 
+const INPUT_COMMAND_LABEL = "Input your command";
+
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
     "vscodePipe.convert",
     function () {
       const editor = vscode.window.activeTextEditor;
-      if (editor) {
-        const document = editor.document;
-        const selection = editor.selection;
-        const text = document.getText(selection);
+      if (!editor) {
+        return;
+      }
 
-        const config = vscode.workspace.getConfiguration("vscodePipe");
-        const menus = config.get<Menu[]>("menus");
-        if (!menus) {
-          vscode.window.showWarningMessage("Menu is not defined.");
-          return;
-        }
-        console.log("menus=" + menus?.toString());
+      const document = editor.document;
+      const selection = editor.selection;
+      const text = document.getText(selection);
 
-        const maxBuffer = config.get<number>("maxBuffer");
-        console.log("maxBuffer=" + maxBuffer);
+      const config = vscode.workspace.getConfiguration("vscodePipe");
+      const menus = config.get<Menu[]>("menus");
+      if (!menus) {
+        vscode.window.showWarningMessage(
+          "Menu is not defined. Please define in settings.json."
+        );
+        return;
+      }
+      console.log("menus=" + menus?.toString());
 
-        let items: vscode.QuickPickItem[] = [];
-        for (let menu of menus) {
-          items.push({ label: menu.label, description: menu.description });
-        }
+      const maxBuffer = config.get<number>("maxBuffer");
+      console.log("maxBuffer=" + maxBuffer);
 
-        const execAsync = (command: string, input: string): Promise<string> => {
-          return new Promise((resolve, reject) => {
-            const process = exec(
-              command,
-              { maxBuffer: maxBuffer },
-              (error, stdout, stderr) => {
-                if (error) {
-                  reject(error);
-                } else {
-                  if (stderr) {
-                    vscode.window.showInformationMessage(stderr);
-                  }
-                  if (stdout) {
-                    resolve(stdout);
-                  }
-                }
+      let items: vscode.QuickPickItem[] = [];
+      for (let menu of menus) {
+        items.push({ label: menu.label, description: menu.description });
+      }
+      items.push({
+        label: INPUT_COMMAND_LABEL,
+        description: 'e.g. "ls -l"',
+      });
+
+      function execAsync(
+        command: string,
+        input: string
+      ): Promise<[string, string]> {
+        return new Promise((resolve, reject) => {
+          const process = exec(
+            command,
+            { maxBuffer: maxBuffer },
+            (error, stdout, stderr) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve([stdout, stderr]);
               }
-            );
-            process.stdin?.write(input);
-            process.stdin?.end();
-          });
-        };
-
-        vscode.window.showQuickPick(items).then((selectedMenu) => {
-          if (!selectedMenu) {
-            return;
-          }
-
-          (async function () {
-            const command = selectedMenu.description;
-            console.log("command=" + command);
-            if (!command) {
-              return;
             }
-            const result = await execAsync(command, text)
-              .then((output) => {
-                editor.edit((editBuilder) => {
-                  editBuilder.replace(selection, output);
-                });
-              })
-              .catch((error) => {
-                vscode.window.showWarningMessage(error.message);
-              });
-            console.log(result);
-          })();
+          );
+          process.stdin?.write(input);
+          process.stdin?.end();
         });
       }
+
+      async function getCommand(items: vscode.QuickPickItem[]) {
+        let selectedMenu = await vscode.window.showQuickPick(items);
+        if (!selectedMenu) {
+          return;
+        }
+
+        let command: string | undefined;
+        if (selectedMenu.label === INPUT_COMMAND_LABEL) {
+          command = await vscode.window.showInputBox();
+        } else {
+          command = selectedMenu.description;
+        }
+        console.log("command=" + command);
+        if (!command) {
+          return;
+        }
+
+        return command;
+      }
+
+      getCommand(items)
+        .then((command) => {
+          if (command) {
+            return execAsync(command, text);
+          }
+        })
+        .then((output) => {
+          editor.edit((editBuilder) => {
+            if (output) {
+              if (output[0]) {
+                editBuilder.replace(selection, output[0]);
+              }
+              if (output[1]) {
+                vscode.window.showInformationMessage(output[1]);
+              }
+            }
+          });
+        })
+        .catch((error) => {
+          vscode.window.showErrorMessage(error.message);
+        });
     }
   );
 
