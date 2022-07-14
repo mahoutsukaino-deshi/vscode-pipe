@@ -1,70 +1,48 @@
-# vscode-pipe README
+# VSCode Pipe README
 
-This is the README for your extension "vscode-pipe". After writing up a brief description, we recommend including the following sections.
+VSCode Pipe enables pipelining in Visual Studio Code. It executes commands with the selected part on the editor as standard input and replaces it with the standard output of the execution result. The output on the standard error output is displayed as an informational message.
+You can execute any command you like by entering the command. Since it is tedious to type the same command every time, you can register commands in advance and select them from the menu. Of course, you can also execute programs created in your favorite language such as Python or Ruby.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+In the following capture, this is what is being executed.
 
-For example if there is an image subfolder under your extension project workspace:
+1. execute the ls command registered in the menu.
+2. Count the number of lines in the result of the ls command using the wc command.
+3. After undoing the result, use grep command to extract only the lines that contain Map.
 
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+![](screen.gif)
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+The following settings can be added to setting.json
 
-For example:
+![](settings.json.png)
 
-This extension contributes the following settings:
+- Maximum buffer size
+- menu
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+  Specify the name of the command in label; describe the command to be executed in description.
 
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
+  ```json
+  "vscodePipe.menus": [
+      {
+        "label": "Upper Case",
+        "description": "tr '[:lower:]' '[:upper:]' "
+      },
+      {
+        "label": "ls",
+        "description": "ls -l"
+      },
+      {
+        "label": "hostname",
+        "description": "hostname"
+      }
+  ]
+  ```
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release.
