@@ -1,6 +1,6 @@
 # VSCode Pipe README
 
-VSCode Pipe enables pipelining in Visual Studio Code. It executes commands with the selected part on the editor as standard input and replaces it with the standard output of the execution result. The output on the standard error output is displayed as an informational message.
+VSCode Pipe enables pipelining in Visual Studio Code. It executes commands with the selected part on the editor as STDIN and replaces it with the STDOUT of the execution result. The output on the STDERR is displayed as an informational message.
 You can execute any command you like by entering the command. Since it is tedious to type the same command every time, you can register commands in advance and select them from the menu. Of course, you can also execute programs created in your favorite language such as Python or Ruby.
 
 ## Features
