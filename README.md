@@ -72,6 +72,6 @@ The following settings can be made in setting.json.
 
 ## Release Notes
 
-### 1.0.0
+### 0.0.1
 
 First release.
