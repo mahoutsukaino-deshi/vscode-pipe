@@ -1,16 +1,27 @@
 {
   "name": "vscode-pipe",
-  "displayName": "vscode pipe",
-  "description": "VSCode Pipe",
   "version": "0.0.1",
-  "license": "MIT",
-  "author": "masato.fujimoto",
+  "publisher": "mtfuji",
   "engines": {
     "vscode": "^1.68.0"
   },
+  "license": "MIT",
+  "displayName": "VSCode Pipe",
+  "description": "It can be commanded in Visual Studio Code.",
+  "author": "masato.fujimoto",
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "execute",
+    "command",
+    "pipeline"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mahoutsukaino-deshi/vscode-pipe"
+  },
+  "icon": "img/icon.png",
   "activationEvents": [
     "onCommand:vscodePipe.convert"
   ],
@@ -47,16 +58,12 @@
           "description": "VSCode Command Menu",
           "default": [
             {
-              "label": "Upper Case",
+              "label": "upper case",
               "description": "tr '[:lower:]' '[:upper:]' "
             },
             {
               "label": "ls",
               "description": "ls -l"
-            },
-            {
-              "label": "hostname",
-              "description": "hostname"
             }
           ]
         },
