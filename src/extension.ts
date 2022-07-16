@@ -6,7 +6,7 @@ type Menu = {
   description: string;
 };
 
-const INPUT_COMMAND_LABEL = "Input your command";
+const INPUT_COMMAND_LABEL = "Run Command:";
 
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
@@ -38,10 +38,8 @@ export function activate(context: vscode.ExtensionContext) {
       for (let menu of menus) {
         items.push({ label: menu.label, description: menu.description });
       }
-      items.push({
-        label: INPUT_COMMAND_LABEL,
-        description: 'e.g. "ls -l"',
-      });
+      items.push({ label: "", kind: vscode.QuickPickItemKind.Separator });
+      items.push({ label: INPUT_COMMAND_LABEL });
 
       function execAsync(
         command: string,
