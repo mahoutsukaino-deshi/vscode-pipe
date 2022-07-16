@@ -1,48 +1,77 @@
 # VSCode Pipe README
 
-VSCode Pipe enables pipelining in Visual Studio Code. It executes commands with the selected part on the editor as STDIN and replaces it with the STDOUT of the execution result. The output on the STDERR is displayed as an informational message.
-You can execute any command you like by entering the command. Since it is tedious to type the same command every time, you can register commands in advance and select them from the menu. Of course, you can also execute programs created in your favorite language such as Python or Ruby.
+VSCode Pipe allows you to execute commands from Visual Studio Code. The selection made in the editor is passed to the command as stdin. The selected part is replaced by the result of the command execution output to the stdout. Any output to stderr output is displayed as an informational message.
+For example, if you select multiple lines in the editor screen and execute the sort command, the text will be replaced with the sorted results. if you execute grep, only the lines that match the search results will be displayed.
+You can also run your own programs. The program must be made to read data from stdin and output to stdout.
+
+The capture below is an example of execution. The following operations are performed.
+
+1. Execute the ls command registered in the menu.
+2. Convert the result of the ls command to uppercase.
+3. Enter a number on the screen and execute sort | uniq.
+4. Execute wc -l command to display the number of lines in the result of 4.
+
+![](img/screen.gif)
 
 ## Features
 
-In the following capture, this is what is being executed.
+- How to start
+  Select "VSCode Pipe" in the command palette.
+  You can also use the following shortcut
+  MAC: Command + Option + p
+  Windows: Ctrl + Alt + p
 
-1. execute the ls command registered in the menu.
-2. Count the number of lines in the result of the ls command using the wc command.
-3. After undoing the result, use grep command to extract only the lines that contain Map.
+- Select a command from the menu and execute it
+  Frequently used commands can be registered in the menu, and can be added to the menu with "vscodePipe.menus" in the setting.json file.
 
-![](screen.gif)
+- Executing a command
+  Select "Run Command" to enter and execute a command.
+
+- Standard output buffer size
+  The following error may occur when executing the command.
+
+  ```
+  Error: maxBuffer exceeded.
+  ```
+
+  If this error occurs, you can work around it by increasing the buffer size. The buffer size can be specified in settings.json under "vscodePipe.maxBuffer".
 
 ## Extension Settings
 
-The following settings can be added to setting.json
+The following settings can be made in setting.json.
 
-![](settings.json.png)
+- vscodePipe.menus
 
-- Maximum buffer size
-- menu
+  Register a menu.
 
-  Specify the name of the command in label; describe the command to be executed in description.
+  - label
+    Specify the name of the command.
+  - description
+    Specifies the actual command to be invoked.
 
   ```json
   "vscodePipe.menus": [
-      {
-        "label": "Upper Case",
-        "description": "tr '[:lower:]' '[:upper:]' "
-      },
-      {
-        "label": "ls",
-        "description": "ls -l"
-      },
-      {
-        "label": "hostname",
-        "description": "hostname"
-      }
+    {
+      "label": "upper case",
+      "description": "tr '[:lower:]' '[:upper:]' "
+    },
+    {
+      "label": "ls",
+      "description": "ls -l"
+    }
   ]
+  ```
+
+- vscodePipe.maxBuffer
+
+  Specifies the maximum buffer size for standard output. The default value is 1048576.
+
+  ```json
+  "vscodePipe.maxBuffer": 1048576
   ```
 
 ## Release Notes
 
 ### 1.0.0
 
-Initial release.
+First release.
