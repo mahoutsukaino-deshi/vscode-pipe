@@ -1,0 +1,82 @@
+name: Publish extension
+run-name: Publish extension [${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref }}]
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing version tag (example: v0.1.0)"
+        required: true
+        type: string
+      publish:
+        description: "Publish to Visual Studio Marketplace (false = build only)"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketplace-publish
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - name: Validate tag format
+        run: node -e 'if (!/^v\d+\.\d+\.\d+$/.test(process.env.RELEASE_TAG)) throw new Error("Use a stable version tag such as v0.1.0")'
+      - uses: actions/checkout@v5
+        with:
+          ref: refs/tags/${{ inputs.tag || github.ref_name }}
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Validate release version
+        run: node -e 'const packageVersion = require("./package.json").version; if (`v${packageVersion}` !== process.env.RELEASE_TAG) throw new Error(`Tag ${process.env.RELEASE_TAG} does not match package version v${packageVersion}`)'
+      - run: npm ci --include=dev
+      - run: xvfb-run -a npm test
+      - run: npm run package:marketplace
+      - uses: actions/upload-artifact@v6
+        with:
+          name: marketplace-vsix
+          path: artifacts/vs-code-pipe.vsix
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: github.event_name == 'push' || inputs.publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: marketplace
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: refs/tags/${{ inputs.tag || github.ref_name }}
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --include=dev
+      - uses: actions/download-artifact@v7
+        with:
+          name: marketplace-vsix
+          path: artifacts
+      - name: Publish to Visual Studio Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo '::error::Set the VSCE_PAT secret in the marketplace environment.'
+            exit 1
+          fi
+          npx --no-install vsce publish --packagePath artifacts/vs-code-pipe.vsix
