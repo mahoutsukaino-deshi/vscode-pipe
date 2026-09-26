@@ -72,6 +72,11 @@ The following settings can be made in setting.json.
 
 ## Release Notes
 
+### 0.0.2
+
+- Added sample Python scripts for text transformation and pipe processing.
+- Added a VS Code settings sample and documentation for installing and using the scripts.
+
 ### 0.0.1
 
 First release.
