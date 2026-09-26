@@ -1,0 +1,48 @@
+{
+  "vscodePipe.menus": [
+    {
+      "label": "Sort",
+      "description": "python ~/vscode-pipe/sort.py"
+    },
+    {
+      "label": "Uniq",
+      "description": "python ~/vscode-pipe/uniq.py"
+    },
+    {
+      "label": "Basename",
+      "description": "python ~/vscode-pipe/basename.py"
+    },
+    {
+      "label": "To Lower",
+      "description": "python ~/vscode-pipe/to_lower.py"
+    },
+    {
+      "label": "To Upper",
+      "description": "python ~/vscode-pipe/to_upper.py"
+    },
+    {
+      "label": "Delete Empty Line",
+      "description": "python ~/vscode-pipe/delete_empty_line.py"
+    },
+    {
+      "label": "Camel to Kebab",
+      "description": "python ~/vscode-pipe/camel_to_kebab.py"
+    },
+    {
+      "label": "Camel to Snake",
+      "description": "python ~/vscode-pipe/camel_to_snake.py"
+    },
+    {
+      "label": "Kebab to Camel",
+      "description": "python ~/vscode-pipe/kebab_to_camel.py"
+    },
+    {
+      "label": "Make Markdown Table",
+      "description": "python ~/vscode-pipe/make_markdown_table.py"
+    },
+    {
+      "label": "Snake to Camel",
+      "description": "python ~/vscode-pipe/snake_to_camel.py"
+    }
+  ]
+}
